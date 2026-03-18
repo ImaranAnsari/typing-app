@@ -15,54 +15,39 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 const MAX_LINES = 20;
 const MIN_LINES = 8;
 
+type AppState = 'START' | 'IDLE' | 'TYPING' | 'FINISHED';
+type AppMode = 'CODE' | 'TEXT';
+
 function App() {
-  const [appState, setAppState] = useState('START');
-  const [appMode, setAppMode] = useState('CODE');
-  const [projectFiles, setProjectFiles] = useState([]);
-  const [currentFileName, setCurrentFileName] = useState('');
-  const [snippet, setSnippet] = useState('');
+  const [appState, setAppState] = useState<AppState>('START');
+  const [appMode, setAppMode] = useState<AppMode>('CODE');
+  const [projectFiles, setProjectFiles] = useState<File[]>([]);
+  const [currentFileName, setCurrentFileName] = useState<string>('');
+  const [snippet, setSnippet] = useState<string>('');
 
-  const [userInput, setUserInput] = useState('');
-  const [startTime, setStartTime] = useState(null);
-  const [errors, setErrors] = useState(0);
-  const [wpm, setWpm] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
+  const [userInput, setUserInput] = useState<string>('');
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [errors, setErrors] = useState<number>(0);
+  const [wpm, setWpm] = useState<number>(0);
+  const [currentTime, setCurrentTime] = useState<number>(0);
 
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleFolderSelect = async (e) => {
-    const validFiles = filterCodeFiles(Array.from(e.target.files));
+  const resetTypingState = useCallback(() => {
+    setUserInput('');
+    setStartTime(null);
+    setErrors(0);
+    setWpm(0);
+    setCurrentTime(0);
+    setAppState('IDLE');
+    if (containerRef.current) containerRef.current.focus();
+  }, []);
 
-    if (validFiles.length === 0) {
-      alert("No suitable JS/TS files found in the selected directory.\nPlease select a Node.js/React project folder.");
-      return;
-    }
-
-    setProjectFiles(validFiles);
-    setAppMode('CODE');
-    await loadRandomSnippet(validFiles, 'CODE');
-  };
-
-  const handleTextFileSelect = async (e) => {
-    const validFiles = filterTextFiles(Array.from(e.target.files));
-
-    if (validFiles.length === 0) {
-      alert("Please select valid .txt, .pdf, or .md files.");
-      return;
-    }
-
-    setProjectFiles(validFiles);
-    setAppMode('TEXT');
-    await loadRandomSnippet(validFiles, 'TEXT');
-
-    e.target.value = null;
-  };
-
-  const loadRandomSnippet = async (files = projectFiles, mode = appMode) => {
+  const loadRandomSnippet = useCallback(async (files: File[] = projectFiles, mode: AppMode = appMode) => {
     if (files.length === 0) return;
 
     let selectedText = '';
-    let selectedFile = null;
+    let selectedFile: File | null = null;
     let attempts = 0;
 
     while (selectedText.length < 50 && attempts < 10) {
@@ -75,22 +60,40 @@ function App() {
       attempts++;
     }
 
-    if (selectedText) {
+    if (selectedText && selectedFile) {
       setCurrentFileName(selectedFile.name || selectedFile.webkitRelativePath);
       setSnippet(selectedText);
       resetTypingState();
       setAppState('IDLE');
     }
+  }, [projectFiles, appMode, resetTypingState]);
+
+  const handleFolderSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const validFiles = filterCodeFiles(Array.from(e.target.files ?? []));
+
+    if (validFiles.length === 0) {
+      alert("No suitable JS/TS files found in the selected directory.\nPlease select a Node.js/React project folder.");
+      return;
+    }
+
+    setProjectFiles(validFiles);
+    setAppMode('CODE');
+    await loadRandomSnippet(validFiles, 'CODE');
   };
 
-  const resetTypingState = () => {
-    setUserInput('');
-    setStartTime(null);
-    setErrors(0);
-    setWpm(0);
-    setCurrentTime(0);
-    setAppState('IDLE');
-    if (containerRef.current) containerRef.current.focus();
+  const handleTextFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const validFiles = filterTextFiles(Array.from(e.target.files ?? []));
+
+    if (validFiles.length === 0) {
+      alert("Please select valid .txt, .pdf, or .md files.");
+      return;
+    }
+
+    setProjectFiles(validFiles);
+    setAppMode('TEXT');
+    await loadRandomSnippet(validFiles, 'TEXT');
+
+    e.target.value = '';
   };
 
   const handleGoBack = () => {
@@ -105,7 +108,17 @@ function App() {
     setCurrentTime(0);
   };
 
-  const handleKeyDown = useCallback((e) => {
+  const finishTest = useCallback((finalInput: string) => {
+    setAppState('FINISHED');
+    const end = Date.now();
+
+    const timeInMinutes = (end - (startTime ?? end)) / 60000;
+    const wordsTyped = finalInput.length / 5;
+    const calculatedWpm = Math.round(wordsTyped / timeInMinutes);
+    setWpm(calculatedWpm);
+  }, [startTime]);
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (appState === 'FINISHED' || appState === 'START') {
       if (e.key === 'Enter' && appState === 'FINISHED') {
         loadRandomSnippet();
@@ -134,7 +147,7 @@ function App() {
         setUserInput(prev => prev + '\n');
       } else {
         setUserInput(prev => prev + '\n');
-        setErrors(e => e + 1);
+        setErrors(errs => errs + 1);
       }
       e.preventDefault();
     } else if (e.key.length === 1) {
@@ -150,25 +163,15 @@ function App() {
       });
       e.preventDefault();
     }
-  }, [appState, snippet, userInput]);
+  }, [appState, snippet, userInput, loadRandomSnippet, finishTest]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
-  const finishTest = (finalInput) => {
-    setAppState('FINISHED');
-    const end = Date.now();
-
-    const timeInMinutes = (end - startTime) / 60000;
-    const wordsTyped = finalInput.length / 5;
-    const calculatedWpm = Math.round(wordsTyped / timeInMinutes);
-    setWpm(calculatedWpm);
-  };
-
   useEffect(() => {
-    let interval;
+    let interval: ReturnType<typeof setInterval> | undefined;
     if (appState === 'TYPING' && startTime) {
       interval = setInterval(() => {
         const now = Date.now();

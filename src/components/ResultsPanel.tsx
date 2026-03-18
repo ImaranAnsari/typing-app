@@ -1,9 +1,18 @@
-import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, RefreshCw, Zap, Target, Clock } from 'lucide-react';
 import { wpmColorClass, accColorStyle } from '../utils/statColors';
 
-function ResultsPanel({ appState, onNext, wpm, accuracy, currentTime }) {
+type AppState = 'START' | 'IDLE' | 'TYPING' | 'FINISHED';
+
+interface ResultsPanelProps {
+  appState: AppState;
+  onNext: () => void;
+  wpm: number;
+  accuracy: number;
+  currentTime: number;
+}
+
+function ResultsPanel({ appState, onNext, wpm, accuracy, currentTime }: ResultsPanelProps) {
   return (
     <AnimatePresence>
       {appState === 'FINISHED' && (
