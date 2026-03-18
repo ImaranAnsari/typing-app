@@ -1,7 +1,10 @@
-import React from 'react';
 import { Code2 } from 'lucide-react';
 
-function Header({ appMode }) {
+interface HeaderProps {
+  appMode: 'CODE' | 'TEXT';
+}
+
+function Header({ appMode }: HeaderProps) {
   return (
     <header className="app-header">
       <div className="icon-wrapper glass-element">

@@ -1,6 +1,12 @@
-import React from 'react';
+type AppState = 'START' | 'IDLE' | 'TYPING' | 'FINISHED';
 
-function TypingArea({ snippet, userInput, appState }) {
+interface TypingAreaProps {
+  snippet: string;
+  userInput: string;
+  appState: AppState;
+}
+
+function TypingArea({ snippet, userInput, appState }: TypingAreaProps) {
   const progress = snippet.length > 0 ? (userInput.length / snippet.length) * 100 : 0;
 
   const renderCharacters = () => {

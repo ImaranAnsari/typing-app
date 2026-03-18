@@ -1,8 +1,16 @@
-import React from 'react';
 import { Target, Clock, Zap, FolderOpen, RefreshCw, Home } from 'lucide-react';
 import { wpmColorClass, accColorClass } from '../utils/statColors';
 
-function StatsBar({ wpm, accuracy, currentTime, currentFileName, onSkip, onBack }) {
+interface StatsBarProps {
+  wpm: number;
+  accuracy: number;
+  currentTime: number;
+  currentFileName: string;
+  onSkip: () => void;
+  onBack: () => void;
+}
+
+function StatsBar({ wpm, accuracy, currentTime, currentFileName, onSkip, onBack }: StatsBarProps) {
   return (
     <div className="top-bar">
       <div className="stats-container">

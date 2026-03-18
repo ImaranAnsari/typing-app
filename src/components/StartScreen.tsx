@@ -1,8 +1,12 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { FolderOpen, Code2, FileText } from 'lucide-react';
 
-function StartScreen({ handleFolderSelect, handleTextFileSelect }) {
+interface StartScreenProps {
+  handleFolderSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleTextFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+function StartScreen({ handleFolderSelect, handleTextFileSelect }: StartScreenProps) {
   return (
     <motion.div 
       key="start"
