@@ -1,5 +1,6 @@
 import React from 'react';
 import { Target, Clock, Zap, FolderOpen, RefreshCw, Home } from 'lucide-react';
+import { wpmColorClass, accColorClass } from '../utils/statColors';
 
 function StatsBar({ wpm, accuracy, currentTime, currentFileName, onSkip, onBack }) {
   return (
@@ -9,13 +10,13 @@ function StatsBar({ wpm, accuracy, currentTime, currentFileName, onSkip, onBack 
           <div className="stat-label">
             <Zap size={14} /> WPM
           </div>
-          <span className="stat-value">{wpm}</span>
+          <span className={`stat-value ${wpmColorClass(wpm)}`}>{wpm}</span>
         </div>
         <div className="stat-box">
           <div className="stat-label">
             <Target size={14} /> ACC
           </div>
-          <span className="stat-value">{accuracy}%</span>
+          <span className={`stat-value ${accColorClass(accuracy)}`}>{accuracy}%</span>
         </div>
         <div className="stat-box">
           <div className="stat-label">

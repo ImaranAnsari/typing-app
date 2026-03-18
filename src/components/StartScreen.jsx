@@ -12,17 +12,17 @@ function StartScreen({ handleFolderSelect, handleTextFileSelect }) {
       className="start-screen glass-panel"
     >
       <div className="giant-icon-circle">
-        <FolderOpen size={48} color="var(--accent-color)" />
+        <FolderOpen size={40} color="var(--accent-color)" />
       </div>
       <h2>Select Workspace</h2>
       <p className="description">
         Choose your local Node.js project folder to practice coding, or upload PDF/TXT/MD files for text practice.
       </p>
       
-      <div className="options-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', width: '100%', marginTop: '1rem' }}>
-        <div className="file-input-wrapper" style={{ height: '140px' }}>
-          <button className="primary file-button" tabIndex={-1} style={{ width: '100%', height: '100%', flexDirection: 'column', gap: '12px', fontSize: '1.1rem' }}>
-            <Code2 size={32} />
+      <div className="options-grid">
+        <div className="option-card file-input-wrapper">
+          <button className="primary option-btn" tabIndex={-1}>
+            <Code2 size={28} />
             Code Folder
           </button>
           <input 
@@ -34,10 +34,10 @@ function StartScreen({ handleFolderSelect, handleTextFileSelect }) {
             className="folder-input"
           />
         </div>
-        <div className="file-input-wrapper" style={{ height: '140px' }}>
-          <button className="secondary file-button" style={{ width: '100%', height: '100%', flexDirection: 'column', gap: '12px', fontSize: '1.1rem', borderColor: 'var(--accent-color)', color: 'var(--accent-color)' }} tabIndex={-1}>
-            <FileText size={32} />
-            Text/PDF/MD Files
+        <div className="option-card file-input-wrapper">
+          <button className="secondary option-btn" tabIndex={-1}>
+            <FileText size={28} />
+            Text / PDF / MD
           </button>
           <input 
             type="file" 
@@ -49,6 +49,10 @@ function StartScreen({ handleFolderSelect, handleTextFileSelect }) {
           />
         </div>
       </div>
+
+      <p className="shortcut-hint">
+        <kbd>Esc</kbd> skip snippet &nbsp;·&nbsp; <kbd>Enter</kbd> next after finish
+      </p>
     </motion.div>
   );
 }

@@ -1,8 +1,9 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, RefreshCw } from 'lucide-react';
+import { Trophy, RefreshCw, Zap, Target, Clock } from 'lucide-react';
+import { wpmColorClass, accColorStyle } from '../utils/statColors';
 
-function ResultsPanel({ appState, onNext }) {
+function ResultsPanel({ appState, onNext, wpm, accuracy, currentTime }) {
   return (
     <AnimatePresence>
       {appState === 'FINISHED' && (
@@ -12,18 +13,44 @@ function ResultsPanel({ appState, onNext }) {
           exit={{ opacity: 0 }}
           className="results-panel glass-panel"
         >
-          <div className="results-info">
-            <div className="results-icon">
-              <Trophy size={28} />
+          <div className="results-top">
+            <div className="results-info">
+              <div className="results-icon">
+                <Trophy size={28} />
+              </div>
+              <div className="results-text">
+                <h3>Test Completed!</h3>
+                <p>Press Enter or click Next to continue.</p>
+              </div>
             </div>
-            <div className="results-text">
-              <h3>Test Completed!</h3>
-              <p>Amazing work typing real code.</p>
+            <button className="primary small" onClick={onNext}>
+              Next Snippet <RefreshCw size={16} />
+            </button>
+          </div>
+
+          <div className="results-stats">
+            <div className="result-stat">
+              <span className={`result-stat-value ${wpmColorClass(wpm)}`}>
+                <Zap size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
+                {wpm}
+              </span>
+              <span className="result-stat-label">WPM</span>
+            </div>
+            <div className="result-stat">
+              <span className="result-stat-value" style={{ color: accColorStyle(accuracy) }}>
+                <Target size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
+                {accuracy}%
+              </span>
+              <span className="result-stat-label">Accuracy</span>
+            </div>
+            <div className="result-stat">
+              <span className="result-stat-value" style={{ color: 'var(--text-primary)' }}>
+                <Clock size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
+                {currentTime}s
+              </span>
+              <span className="result-stat-label">Time</span>
             </div>
           </div>
-          <button className="primary" onClick={onNext}>
-            Next Snippet <RefreshCw size={16} />
-          </button>
         </motion.div>
       )}
     </AnimatePresence>
