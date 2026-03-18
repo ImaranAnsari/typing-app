@@ -1,6 +1,8 @@
 import React from 'react';
 
 function TypingArea({ snippet, userInput, appState }) {
+  const progress = snippet.length > 0 ? (userInput.length / snippet.length) * 100 : 0;
+
   const renderCharacters = () => {
     return snippet.split('').map((char, index) => {
       let className = 'char ';
@@ -29,6 +31,12 @@ function TypingArea({ snippet, userInput, appState }) {
 
   return (
     <div className={`typing-container glass-panel ${appState === 'IDLE' ? 'pulse-glow' : ''}`}>
+      <div className="progress-bar-wrapper">
+        <div
+          className="progress-bar-fill"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
       <div className="typing-area code-font">
         {renderCharacters()}
         {userInput.length === snippet.length && appState !== 'FINISHED' && (

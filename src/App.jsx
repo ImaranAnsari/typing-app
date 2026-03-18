@@ -222,10 +222,15 @@ function App() {
               <ResultsPanel
                 appState={appState}
                 onNext={() => loadRandomSnippet()}
+                wpm={wpm}
+                accuracy={accuracy}
+                currentTime={currentTime}
               />
 
               {appState === 'IDLE' && (
-                <p className="idle-text">Start typing to begin... (Esc to skip)</p>
+                <p className="idle-text">
+                  Start typing to begin &nbsp;·&nbsp; <kbd>Esc</kbd> to skip
+                </p>
               )}
             </motion.div>
           )}
