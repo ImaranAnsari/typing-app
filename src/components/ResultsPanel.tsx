@@ -1,22 +1,22 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, RefreshCw, Zap, Target, Clock } from 'lucide-react';
-import { wpmColorClass, accColorStyle } from '../utils/statColors';
+import { Trophy, RefreshCw, BarChart2 } from 'lucide-react';
+import { wpmColorClass, accColorClass } from '../utils/statColors';
 
-type AppState = 'START' | 'IDLE' | 'TYPING' | 'FINISHED';
-
-interface ResultsPanelProps {
-  appState: AppState;
-  onNext: () => void;
+interface Props {
+  appState: string;
   wpm: number;
   accuracy: number;
   currentTime: number;
+  errors: number;
+  onNext: () => void;
+  onLeaderboard: () => void;
 }
 
-function ResultsPanel({ appState, onNext, wpm, accuracy, currentTime }: ResultsPanelProps) {
+export default function ResultsPanel({ appState, wpm, accuracy, currentTime, errors, onNext, onLeaderboard }: Props) {
   return (
     <AnimatePresence>
       {appState === 'FINISHED' && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
@@ -24,46 +24,43 @@ function ResultsPanel({ appState, onNext, wpm, accuracy, currentTime }: ResultsP
         >
           <div className="results-top">
             <div className="results-info">
-              <div className="results-icon">
-                <Trophy size={28} />
-              </div>
+              <div className="results-icon"><Trophy size={26} /></div>
               <div className="results-text">
-                <h3>Test Completed!</h3>
-                <p>Press Enter or click Next to continue.</p>
+                <h3>Test Complete!</h3>
+                <p>Great work — result saved.</p>
               </div>
             </div>
-            <button className="primary small" onClick={onNext}>
-              Next Snippet <RefreshCw size={16} />
-            </button>
+
+            <div className="results-stats">
+              <div className="result-stat">
+                <span className={`result-stat-value ${wpmColorClass(wpm)}`}>{wpm}</span>
+                <span className="result-stat-label">WPM</span>
+              </div>
+              <div className="result-stat">
+                <span className={`result-stat-value ${accColorClass(accuracy)}`}>{accuracy}%</span>
+                <span className="result-stat-label">Accuracy</span>
+              </div>
+              <div className="result-stat">
+                <span className="result-stat-value">{currentTime}s</span>
+                <span className="result-stat-label">Time</span>
+              </div>
+              <div className="result-stat">
+                <span className={`result-stat-value${errors > 5 ? ' bad' : errors > 0 ? ' warning' : ' good'}`}>{errors}</span>
+                <span className="result-stat-label">Errors</span>
+              </div>
+            </div>
           </div>
 
-          <div className="results-stats">
-            <div className="result-stat">
-              <span className={`result-stat-value ${wpmColorClass(wpm)}`}>
-                <Zap size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
-                {wpm}
-              </span>
-              <span className="result-stat-label">WPM</span>
-            </div>
-            <div className="result-stat">
-              <span className="result-stat-value" style={{ color: accColorStyle(accuracy) }}>
-                <Target size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
-                {accuracy}%
-              </span>
-              <span className="result-stat-label">Accuracy</span>
-            </div>
-            <div className="result-stat">
-              <span className="result-stat-value" style={{ color: 'var(--text-primary)' }}>
-                <Clock size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
-                {currentTime}s
-              </span>
-              <span className="result-stat-label">Time</span>
-            </div>
+          <div className="results-actions">
+            <button className="secondary small" onClick={onLeaderboard}>
+              <BarChart2 size={15} /> Scores
+            </button>
+            <button className="primary small" onClick={onNext} style={{ width: 'auto' }}>
+              Next Snippet <RefreshCw size={15} />
+            </button>
           </div>
         </motion.div>
       )}
     </AnimatePresence>
   );
 }
-
-export default ResultsPanel;
